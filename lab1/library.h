@@ -10,15 +10,15 @@ struct Array {
     char **arrayOfBlocks;
 };
 
-struct Array createArrayOfBlocks(int size);
+struct Array init(int size);
 
-void wcProcedure(char *fileName, struct Array array);
+void count(char *fileName, struct Array array);
 
-char* returnBlock(int index, struct Array array);
+char* block(int index, struct Array array);
 
-void removeBlock(int index, struct Array array);
+void delete(int index, struct Array array);
 
-void removeArrayOfBlocks(struct Array array);
+void destroy(struct Array array);
 
 
 

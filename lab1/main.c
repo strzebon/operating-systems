@@ -1,67 +1,53 @@
 #include "library.c"
 #include <time.h>
 #include <sys/times.h>
-#define MAX_LENGTH 2000
 
 int main(){
     struct timespec timespecStart, timespecEnd;
     struct tms tmsStart, tmsEnd;
+    char *first;
+    char *second;
 
     for(;;){
+        char *command = calloc(MAX_SIZE, sizeof(char));
+        first = calloc(MAX_SIZE, sizeof(char));
+        second = calloc(MAX_SIZE, sizeof(char));
+
+        printf(">>");
+        fgets(command, MAX_SIZE, stdin);
+        sscanf(command, "%s%s", first, second);
+//        printf("%s\n", first);
+//        printf("%s \n", second);
+
+        struct Array array;
+
         clock_gettime(CLOCK_REALTIME, &timespecStart);
         times(&tmsStart);
 
-        char *command = calloc(MAX_LENGTH, sizeof(char));
-        fgets(command, MAX_LENGTH, stdin);
-        char c;
-        int i = 0;
-        for(; i<MAX_LENGTH; i++){
-            c = command[i];
-            if(!isspace(c)) break;
-        }
-        char *first = calloc(MAX_LENGTH, sizeof(char));
-        int j = 0;
-        for(;i<MAX_LENGTH; i++){
-            c = command[i];
-            if(isspace(c)) break;
-            first[j] = c;
-            j++;
-        }
-        first = realloc(first,j * sizeof(char));
-
-        for(; i<MAX_LENGTH; i++){
-            c = command[i];
-            if(!isspace(c)) break;
-        }
-
-        char *second = calloc(100, sizeof(char));
-        int k = 0;
-        for(;i<MAX_LENGTH; i++){
-            c = command[i];
-            if(isspace(c)) break;
-            second[k] = c;
-            k++;
-        }
-        second = realloc(second,k * sizeof(char));
-        struct Array array;
-
         if(strcmp(first, "init") == 0){
-            array = createArrayOfBlocks(atoi(second));
+            array = init(atoi(second));
         }
         else if(strcmp(first, "count") == 0){
-            wcProcedure(second, array);
+            count(second, array);
         }
         else if(strcmp(first, "show") == 0){
-            printf("%s \n", returnBlock(atoi(second), array));
+            printf("%s \n", block(atoi(second), array));
         }
         else if(strcmp(first, "delete") == 0){
-            removeBlock(atoi(second), array);
+            delete(atoi(second), array);
         }
         else if(strcmp(first, "destroy") == 0){
-            removeArrayOfBlocks(array);
+            destroy(array);
         }
-        else{
-            printf("Unknown command \n");
+        else if(strcmp(first, "exit") == 0){
+            free(command);
+            free(first);
+            free(second);
+            break;
+        }
+        else
+        {
+            printf("unknown command \n");
         }
 
         clock_gettime(CLOCK_REALTIME, &timespecEnd);
@@ -70,8 +56,10 @@ int main(){
         printf("REAL: %ld ns\n", timespecEnd.tv_nsec - timespecStart.tv_nsec);
         printf("USER: %ld ticks\n", tmsEnd.tms_cutime - tmsStart.tms_cutime);
         printf("SYSTEM: %ld ticks\n", tmsEnd.tms_cstime - tmsStart.tms_cstime);
-    }
 
+        free(first);
+        free(second);
+    }
 
     return 0;
 }

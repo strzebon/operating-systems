@@ -1,9 +1,8 @@
 #include "library.h"
-#define MAX_SIZE 200
-#define TEMP_PATH "./tmp/tmp.txt"
+#define MAX_SIZE 2000
 
 
-struct Array createArrayOfBlocks(int size){
+struct Array init(int size){
     struct Array array;
     array.size = malloc(sizeof(int));
     array.numberOfSaved = malloc(sizeof(int));
@@ -13,44 +12,47 @@ struct Array createArrayOfBlocks(int size){
     return array;
 }
 
-void wcProcedure(char *fileName, struct Array array){
+void count(char *fileName, struct Array array){
     char *command = calloc(MAX_SIZE, sizeof(char));
-    for(int i = 0; i < MAX_SIZE; i++){
-        command[i] = 0;
-    }
+//    for(int i = 0; i < MAX_SIZE; i++){
+//        command[i] = 0;
+//    }
+    char tmp[] = "/tmp/tmp_XXXXXX";
+    mkstemp(tmp);
 
     strcpy(command, "wc ");
     strcat(command, fileName);
     strcat(command, " > ");
-    strcat(command, TEMP_PATH);
+    strcat(command, tmp);
     system(command);
 
-    FILE *file = fopen(TEMP_PATH, "r");
-    if(file == NULL) {
-        perror("fopen failed \n");
-    }
+    FILE *file = fopen(tmp, "r");
     fseek(file, 0, SEEK_END);
     size_t fileSize = ftell(file);
     fseek(file, 0, SEEK_SET);
-//    rewind(file);
+
     array.arrayOfBlocks[*array.numberOfSaved] = calloc(fileSize + 1, sizeof(char));
     fread(array.arrayOfBlocks[*array.numberOfSaved], sizeof(char), fileSize, file);
     fclose(file);
     (*array.numberOfSaved)++;
+    strcpy(command, "rm -f ");
+    strcat(command, tmp);
+    system(command);
+    free(command);
 }
 
-char* returnBlock(int index, struct Array array){
+char* block(int index, struct Array array){
     return array.arrayOfBlocks[index];
 }
 
-void removeBlock(int index, struct Array array){
+void delete(int index, struct Array array){
     if(array.arrayOfBlocks[index] == NULL) return;
     memmove(&array.arrayOfBlocks[index], &array.arrayOfBlocks[index+1], (*array.size - index - 1) * sizeof(char *));
     (*array.numberOfSaved)--;
 }
 
-void removeArrayOfBlocks(struct Array array){
+void destroy(struct Array array){
     free(array.arrayOfBlocks);
     free(array.numberOfSaved);
-    free(array.numberOfSaved);
+    free(array.size);
 }
