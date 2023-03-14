@@ -1,8 +1,10 @@
-#include "library.c"
+#include "library.h"
+#include "dllmanager.h"
 #include <time.h>
 #include <sys/times.h>
 
 int main(){
+    load_dll("library.so");
     struct timespec timespecStart, timespecEnd;
     struct tms tmsStart, tmsEnd;
     char *first;
@@ -31,7 +33,7 @@ int main(){
             count(second, array);
         }
         else if(strcmp(first, "show") == 0){
-            printf("%s \n", block(atoi(second), array));
+            printf("\n%s", block(atoi(second), array));
         }
         else if(strcmp(first, "delete") == 0){
             delete(atoi(second), array);
@@ -53,13 +55,13 @@ int main(){
         clock_gettime(CLOCK_REALTIME, &timespecEnd);
         times(&tmsEnd);
 
-        printf("REAL: %ld ns\n", timespecEnd.tv_nsec - timespecStart.tv_nsec);
+        printf("\nREAL: %ld ns\n", timespecEnd.tv_nsec - timespecStart.tv_nsec);
         printf("USER: %ld ticks\n", tmsEnd.tms_cutime - tmsStart.tms_cutime);
         printf("SYSTEM: %ld ticks\n", tmsEnd.tms_cstime - tmsStart.tms_cstime);
 
         free(first);
         free(second);
     }
-
+    close_dll();
     return 0;
 }
