@@ -5,10 +5,10 @@ all:
 	make main_sys
 	make main_lib
 
-main_sys: main.c
+main_sys:
 	$(CC) $(CFLAGS) main.c -o main_sys -D SYS
 
-main_lib: main.c
+main_lib:
 	$(CC) $(CFLAGS) main.c -o main_lib
 
 test:
