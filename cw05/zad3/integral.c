@@ -1,13 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <sys/wait.h>
-#include <string.h>
-#include <sys/times.h>
-#include <time.h>
 #include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
+
 
 double integral(double h, double a, double b){
     double s = 0;
@@ -27,7 +22,7 @@ int main(int argc, char** argv){
     char buf[100];
     char* path = "/tmp/fifo";
 
-    sprintf(buf, "%lf", integral(h, a, b));
+    sprintf(buf, "%lf,", integral(h, a, b));
     int fd = open(path, O_WRONLY);
     write(fd, buf, 100);
     close(fd);

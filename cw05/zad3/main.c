@@ -5,7 +5,6 @@
 #include <string.h>
 #include <sys/times.h>
 #include <time.h>
-#include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 
@@ -25,9 +24,10 @@ int main(int argc, char** argv){
     char path[] = "/tmp/fifo";
     int fd;
     double s = 0;
-    char buf[100];
+    char buf[2048];
     char a[100];
     char b[100];
+    int counter = 0;
 
     mkfifo(path, 0666);
     for(int i=0; i<n; i++){
@@ -37,12 +37,22 @@ int main(int argc, char** argv){
         if(fork() == 0){
             execl("./integral", "integral", argv[1], a, b, NULL);
         }
-        fd = open(path, O_RDONLY);
-        read(fd, buf, 100);
-        s += atof(buf);
-        close(fd);
-        wait(NULL);
     }
+
+    fd = open(path, O_RDONLY);
+
+    while(counter < n){
+        size_t size = read(fd, buf, 2048);
+        buf[size] = 0;
+        char* token = strtok(buf, ",");
+        while(token != NULL){
+            s += atof(buf);
+            token  = strtok(NULL, ",");
+            counter++;
+        }
+    }
+
+    close(fd);
     remove(path);
 
     printf("h = %.9f\n", h);
